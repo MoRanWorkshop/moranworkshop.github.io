@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="墨染工坊 - 传承东方美学的水墨设计工作室">
     <title>墨染工坊 - 艺术设计专家</title>
-        <link rel="icon" href="logo.png">
+    <link rel="icon" href="logo.png">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
@@ -20,6 +20,11 @@
             --serif-font: 'Noto Serif SC', serif;
             --transition: cubic-bezier(0.4, 0, 0.2, 1);
             --section-padding: 8rem 2rem;
+            --ink-flow: linear-gradient(45deg, 
+                rgba(194,43,43,0.1) 0%, 
+                rgba(194,43,43,0.05) 50%,
+                transparent 100%);
+            --golden-filter: linear-gradient(45deg, #d4af37 0%, #cdaa3d 100%);
         }
 
         html {
@@ -45,6 +50,17 @@
             opacity: 0.08;
             pointer-events: none;
             filter: blur(1px);
+        }
+
+        /* 滚动进度条 */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent-color);
+            z-index: 9999;
+            transition: width 0.3s ease-out;
         }
 
         /* 导航系统 */
@@ -461,7 +477,59 @@
             z-index: 1;
         }
 
-        /* 水墨动画 */
+        /* 新增表单样式 */
+        .contact-form {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            background: rgba(255,255,255,0.9);
+            border: 2px solid var(--golden-ink);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            box-shadow: 0 0 12px rgba(212,175,55,0.3);
+            outline: none;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--golden-filter);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-family: var(--handwriting-font);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .form-submit:hover {
+            transform: scale(1.02);
+        }
+
+        /* 新增装饰元素 */
+        .seal-mark {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: url('data:image/svg+xml,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20,20 L80,80 M80,20 L20,80" stroke="%23c22b2b" stroke-width="4"/></svg>');
+            opacity: 0.05;
+            pointer-events: none;
+        }
+
+        /* 动画定义 */
         @keyframes titleReveal {
             to {
                 opacity: 1;
@@ -509,6 +577,9 @@
                 padding: 1.5rem 2rem;
                 border-radius: 12px;
                 box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+                width: 70%;
+                right: 15%;
+                text-align: center;
             }
 
             .nav-links.active {
@@ -550,6 +621,11 @@
 </head>
 <body>
     <canvas class="ink-canvas" id="inkCanvas"></canvas>
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- 页面装饰元素 -->
+    <div class="seal-mark" style="top:20%;left:10%"></div>
+    <div class="seal-mark" style="top:70%;right:15%"></div>
 
     <nav class="navbar">
         <div class="nav-container">
@@ -660,7 +736,13 @@
             <div class="module-content">
                 <div class="contact-wrapper">
                     <div class="contact-info">
-                        <h2>联系我们</h2>
+                        <h2 class="brush-title">墨韵传情</h2>
+                        <form class="contact-form">
+                            <input type="text" class="form-input" placeholder="尊称">
+                            <input type="email" class="form-input" placeholder="锦书">
+                            <textarea class="form-input" rows="5" placeholder="墨宝留痕"></textarea>
+                            <button class="form-submit">飞鸽传书</button>
+                        </form>
                         <address>
                             <p>邮箱：tiantiane0616@126.com</p>
                             <p>微信：J7474747474I</p>
@@ -679,7 +761,7 @@
                         </div>
                     </div>
                     <div class="contact-links">
-                        <h2>友情链接</h2>
+                        <h2 class="brush-title">友情链接</h2>
                         <div class="friend-links">
                             <a href="https://xiaoews.github.io/index.html" class="link-item">小饿工作室</a>
                             <br>
@@ -763,33 +845,48 @@
             }
         }
 
+        class ImageLoader {
+            constructor() {
+                this.observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            this.loadImage(entry.target);
+                            this.observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    rootMargin: '200px 0px',
+                    threshold: 0.01
+                });
+            }
+
+            loadImage(img) {
+                const src = img.dataset.src;
+                const tempImg = new Image();
+                tempImg.onload = () => {
+                    img.src = src;
+                    img.style.transform = 'scale(1)';
+                    img.style.opacity = '1';
+                };
+                tempImg.src = src;
+            }
+
+            init() {
+                document.querySelectorAll('img[data-src]').forEach(img => {
+                    img.style.transform = 'scale(0.95)';
+                    img.style.opacity = '0';
+                    img.style.transition = 'all 0.6s cubic-bezier(0.22, 1, 0.36, 1)';
+                    this.observer.observe(img);
+                });
+            }
+        }
+
         class Interaction {
             static initMobileMenu() {
                 const menu = document.querySelector('.mobile-menu');
                 menu.addEventListener('click', () => {
                     document.querySelector('.nav-links').classList.toggle('active');
                     menu.classList.toggle('active');
-                });
-            }
-
-            static initLazyLoad() {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const img = entry.target;
-                            img.src = img.dataset.src;
-                            img.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                            img.style.opacity = '1';
-                            img.style.transform = 'scale(1)';
-                            observer.unobserve(img);
-                        }
-                    });
-                }, { threshold: 0.1, rootMargin: '200px 0px' });
-
-                document.querySelectorAll('img[data-src]').forEach(img => {
-                    img.style.opacity = '0';
-                    img.style.transform = 'scale(0.95)';
-                    observer.observe(img);
                 });
             }
 
@@ -823,10 +920,18 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             new InkAnimation();
+            new ImageLoader().init();
             Interaction.initMobileMenu();
-            Interaction.initLazyLoad();
             Interaction.initSmoothScroll();
             Interaction.initHoverEffects();
+
+            // 滚动进度条
+            window.addEventListener('scroll', () => {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                document.getElementById('scrollProgress').style.width = scrolled + '%';
+            });
 
             // 导航栏隐藏逻辑
             let lastScroll = 0;
