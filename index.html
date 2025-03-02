@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <link rel="preload" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="case-1.jpg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval';
+               img-src https: data:;
+               font-src https: data:;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="墨染工坊 - 传承东方美学的水墨设计工作室">
@@ -9,6 +16,12 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <meta property="og:type" content="website">
+<meta property="og:title" content="墨染工坊 - 东方美学数字艺术设计专家">
+<meta property="og:image" content="https://yourdomain.com/og-image.jpg">
+    <meta name="keywords" content="水墨设计,品牌视觉设计,文创产品开发,动态水墨动画,东方美学设计,艺术工作室">
+    <meta name="description" content="墨染工坊 - 专注水墨艺术与现代设计融合的专业工作室，提供品牌视觉设计、动态动画、文创产品开发等服务，传承东方美学精髓。">
+    
     <style>
         :root {
             --primary-color: #2d2d2d;
@@ -618,6 +631,7 @@
             }
         }
     </style>
+    
 </head>
 <body>
     <canvas class="ink-canvas" id="inkCanvas"></canvas>
@@ -741,7 +755,6 @@
                             <input type="text" class="form-input" placeholder="尊称">
                             <input type="email" class="form-input" placeholder="锦书">
                             <textarea class="form-input" rows="5" placeholder="墨宝留痕"></textarea>
-                            <button class="form-submit">飞鸽传书</button>
                         </form>
                         <address>
                             <p>邮箱：tiantiane0616@126.com</p>
